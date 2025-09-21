@@ -1,0 +1,26 @@
+# Build outputs
+dist/
+build/
+
+# Generated files
+*.min.*
+
+# Package files
+package-lock.json
+
+# Logs
+*.log
+
+# Coverage reports
+coverage/
+
+# Environment files
+.env*
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
