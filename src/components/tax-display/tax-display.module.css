@@ -3,18 +3,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  p {
-    font-size: 1.2em;
-  }
-
-  .bold-value {
-    font-weight: bold;
-  }
 }
 
 .tax-display__main-info {
   margin: 1em 0;
+
+  p {
+    font-size: 1.2em;
+  }
 }
 
 .tax-display__bracket-table-container {

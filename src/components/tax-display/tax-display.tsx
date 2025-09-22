@@ -44,16 +44,11 @@ export const TaxDisplay = ({
       <h2>Results</h2>
       <div className={styles['tax-display__main-info']}>
         <p>
-          Total taxes:{' '}
-          <span className={styles['bold-value']}>
-            ${calculation?.totalTax.toLocaleString()}
-          </span>
+          Total taxes: <b>${calculation?.totalTax.toLocaleString()}</b>
         </p>
         <p>
           Effective rate:{' '}
-          <span className={styles['bold-value']}>
-            {displayAsPercentage(calculation?.effectiveRate ?? 0)}
-          </span>
+          <b>{displayAsPercentage(calculation?.effectiveRate ?? 0)}</b>
         </p>
       </div>
 
@@ -78,7 +73,9 @@ export const TaxDisplay = ({
                         : ' or\u00A0more' // \u00A0 === &nbsp;
                     }
                   </td>
-                  <td>${item.taxAmount}</td>
+                  <td>
+                    <b>${item.taxAmount}</b>
+                  </td>
                 </tr>
               ))}
             </tbody>
