@@ -75,7 +75,7 @@ h6 {
 }
 
 #app-root {
-  display: flex;
+  display: grid;
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
@@ -174,13 +174,20 @@ select[aria-invalid='true'] {
 @media (prefers-color-scheme: light) {
   /* Light mode color overrides */
   :root {
-    --bg-color: #ffffff;
+    --bg-color: #efefef;
     --text-color: #213547;
+    --text-color-on-dark: #ffffff;
     --border-color: #d1d5db;
     --input-bg: #ffffff;
 
     button {
-      background-color: #f9f9f9;
+      background-color: var(--focus-color);
+      color: var(--text-color-on-dark);
+
+      &:disabled {
+        /* Take new button color and apply same 30% opacity as the browser */
+        color: color-mix(in srgb, var(--text-color-on-dark), transparent 30%);
+      }
     }
   }
 }
