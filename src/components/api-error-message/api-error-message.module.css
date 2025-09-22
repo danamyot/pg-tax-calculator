@@ -1,0 +1,28 @@
+.error-message {
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  margin: 1rem 0;
+  border: 1px solid var(--error-color);
+  /* Make --error-color 90% transparent */
+  background-color: color-mix(in srgb, var(--error-color), transparent 90%);
+  color: var(--error-color);
+}
+
+.error-message__title {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.error-message__text {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.error-message__actions {
+  margin-top: 1rem;
+
+  button {
+    background-color: var(--error-color);
+  }
+}
