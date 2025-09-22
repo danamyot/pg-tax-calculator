@@ -21,11 +21,6 @@
   }
 }
 
-.error-message {
-  color: var(--error-color);
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
+.loading-message {
+  text-align: start;
 }

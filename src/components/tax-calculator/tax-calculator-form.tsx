@@ -100,9 +100,13 @@ export const TaxCalculatorForm = ({
           <option value="2021">2021</option>
           <option value="2022">2022</option>
           {/* enable me to test 404 errors! */}
-          <option value="2024">2024</option>
+          <option value="2024" disabled>
+            2024
+          </option>
         </select>
-        {isFetchingBrackets && <p>Loading tax brackets...</p>}
+        {isFetchingBrackets && (
+          <p className={styles['loading-message']}>Loading tax brackets...</p>
+        )}
       </div>
       <div>
         <label className={styles['tax-form__label']} htmlFor={incomeId}>

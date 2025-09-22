@@ -32,7 +32,9 @@ export const TaxDisplay = ({
     return (
       <section className={styles['tax-display']}>
         <h2>Results</h2>
-        <p>Enter your information to display results.</p>
+        <div className={styles['tax-display__main-info']}>
+          <p>Enter your information to display results.</p>
+        </div>
       </section>
     )
   }
