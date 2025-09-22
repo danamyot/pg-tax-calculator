@@ -1,6 +1,8 @@
 import {
   useCallback,
+  useEffect,
   useId,
+  useRef,
   useState,
   type ChangeEvent,
   type Dispatch,
@@ -26,6 +28,10 @@ const INITIAL_FORM_DATA: FormData = {
   taxYear: '',
   income: '',
 }
+const INITIAL_FORM_VALIDATION: FormData = {
+  taxYear: '',
+  income: '',
+}
 
 export const TaxCalculatorForm = ({
   onTaxCalculation,
@@ -33,6 +39,10 @@ export const TaxCalculatorForm = ({
   onTaxCalculation: Dispatch<SetStateAction<TaxCalculation | null>>
 }) => {
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA)
+  const [formValidation, setFormValidation] = useState(INITIAL_FORM_VALIDATION)
+
+  const taxYearRef = useRef<HTMLSelectElement>(null)
+  const incomeRef = useRef<HTMLInputElement>(null)
 
   const taxYearId = useId()
   const incomeId = useId()
@@ -46,21 +56,54 @@ export const TaxCalculatorForm = ({
   })
   const { tax_brackets: taxBrackets } = data ?? {}
 
-  const handleInputChange = useCallback((field: keyof FormData) => {
-    return (e: InputChangeEvent) => {
-      let value: string | number = e.target.value
+  const validateInput = useCallback((field: keyof FormData) => {
+    // todo: make this dynamic for any future field
+    const ref = field === 'taxYear' ? taxYearRef : incomeRef
+    const validity = ref.current?.validity
 
-      // Convert income to number for math later on, but keep empty string as is
-      if (field === 'income' && value !== '') {
-        value = Number(e.target.value)
-      }
-
-      setFormData(prevFormData => ({
-        ...prevFormData,
-        [field]: value,
+    if (validity?.valueMissing) {
+      setFormValidation(prevValidationData => ({
+        ...prevValidationData,
+        [field]: 'This field is required',
+      }))
+    } else if (validity?.rangeOverflow) {
+      setFormValidation(prevValidationData => ({
+        ...prevValidationData,
+        [field]: 'Income is too high, see a professional!',
+      }))
+    } else if (validity?.rangeUnderflow) {
+      setFormValidation(prevValidationData => ({
+        ...prevValidationData,
+        [field]: 'Income must be more than 0',
+      }))
+    } else {
+      setFormValidation(prevValidationData => ({
+        ...prevValidationData,
+        [field]: undefined,
       }))
     }
   }, [])
+
+  const handleInputChange = useCallback(
+    (field: keyof FormData) => {
+      return (e: InputChangeEvent) => {
+        validateInput(field)
+
+        let value: string | number = e.target.value
+
+        // Convert income to number for math later on, but keep empty string as is
+        if (field === 'income' && value !== '') {
+          value = Number(e.target.value)
+        }
+
+        setFormData(prevFormData => ({
+          ...prevFormData,
+          [field]: value,
+        }))
+      }
+    },
+    [validateInput]
+  )
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -76,6 +119,12 @@ export const TaxCalculatorForm = ({
     }
   }
 
+  // Validate once on load, before user triggers onChange
+  useEffect(() => {
+    validateInput('taxYear')
+    validateInput('income')
+  }, [validateInput])
+
   const canSubmit =
     formData.income && formData.income > 0 && taxBrackets && !isFetchingBrackets
 
@@ -87,6 +136,7 @@ export const TaxCalculatorForm = ({
           Tax Year
         </label>
         <select
+          ref={taxYearRef}
           required
           id={taxYearId}
           value={formData.taxYear}
@@ -107,6 +157,11 @@ export const TaxCalculatorForm = ({
         {isFetchingBrackets && (
           <p className={styles['loading-message']}>Loading tax brackets...</p>
         )}
+        {formValidation['taxYear'] && (
+          <p className={styles['validation-error-message']}>
+            {formValidation['taxYear']}
+          </p>
+        )}
       </div>
       <div>
         <label className={styles['tax-form__label']} htmlFor={incomeId}>
@@ -114,6 +169,7 @@ export const TaxCalculatorForm = ({
         </label>
         <div className={styles['income-input__currency-icon']}>
           <input
+            ref={incomeRef}
             required
             id={incomeId}
             type="number"
@@ -123,6 +179,11 @@ export const TaxCalculatorForm = ({
             onChange={handleInputChange('income')}
           />
         </div>
+        {formValidation['income'] && (
+          <p className={styles['validation-error-message']}>
+            {formValidation['income']}
+          </p>
+        )}
       </div>
       <button type="submit" disabled={!canSubmit}>
         Calculate Tax

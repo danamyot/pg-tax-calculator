@@ -21,6 +21,13 @@
   }
 }
 
-.loading-message {
+.loading-message,
+.validation-error-message {
   text-align: start;
+  font-size: 0.875rem;
+  margin-top: 0.25em;
+}
+
+.validation-error-message {
+  color: var(--error-color);
 }
