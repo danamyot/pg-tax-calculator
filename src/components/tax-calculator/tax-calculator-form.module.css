@@ -2,13 +2,13 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-
-  label {
-    text-align: start;
-  }
 }
 
-.income-input-currency {
+.tax-form__label {
+  text-align: start;
+}
+
+.income-input__currency-icon {
   position: relative;
 
   &::before {

@@ -1,8 +1,15 @@
-import TaxCalculatorForm from './components//tax-calculator/tax-calculator-form'
+import { TaxCalculatorForm } from './components//tax-calculator/tax-calculator-form'
 
 import styles from './App.module.css'
+import { useState } from 'react'
+import type { TaxCalculation } from './types/taxes'
+import { TaxDisplay } from './components/tax-display/tax-display'
 
-function App() {
+export const App = () => {
+  const [taxCalculation, setTaxCalculation] = useState<null | TaxCalculation>(
+    null
+  )
+
   return (
     <div className={styles.app}>
       <header className={styles['app-header']}>
@@ -10,10 +17,9 @@ function App() {
         <p>Calculate your Canadian income tax for any supported year</p>
       </header>
       <main>
-        <TaxCalculatorForm />
+        <TaxCalculatorForm onTaxCalculation={setTaxCalculation} />
+        <TaxDisplay calculation={taxCalculation} />
       </main>
     </div>
   )
 }
-
-export default App
