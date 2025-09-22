@@ -1,8 +1,8 @@
-import { TaxCalculatorForm } from './components//tax-calculator/tax-calculator-form'
+import { useState } from 'react'
 
 import styles from './App.module.css'
-import { useState } from 'react'
 import type { TaxCalculation } from './types/taxes'
+import { TaxCalculatorForm } from './components/tax-calculator/tax-calculator-form'
 import { TaxDisplay } from './components/tax-display/tax-display'
 
 export const App = () => {
