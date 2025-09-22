@@ -1,18 +1,28 @@
-import { useId, useState, type ChangeEvent, type FormEvent } from 'react'
-import type { TaxYear } from '../types/taxes'
-import styles from './tax-calculator-form.module.css'
-import { fetchTaxBrackets } from '../services/api'
+import {
+  useCallback,
+  useId,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from 'react'
 import { useQuery } from '@tanstack/react-query'
+
+import type { TaxYear } from '../../types/taxes'
+import styles from './tax-calculator-form.module.css'
+import { fetchTaxBrackets } from '../../services/api'
+
+import { calculateTaxes } from './calculate-taxes'
+
 interface FormData {
-  income?: number
-  taxYear: TaxYear
+  income: number | ''
+  taxYear: TaxYear | ''
 }
 
 type InputChangeEvent = ChangeEvent<HTMLInputElement | HTMLSelectElement>
 
 const INITIAL_FORM_DATA: FormData = {
-  income: undefined,
-  taxYear: '2022',
+  income: '',
+  taxYear: '',
 }
 
 export default function TaxCalculatorForm() {
@@ -22,26 +32,42 @@ export default function TaxCalculatorForm() {
   const taxYearId = useId()
 
   // Fetch tax brackets for the selected year
-  const { data: taxBrackets, isLoading: isFetchingBrackets } = useQuery({
+  const { data, isLoading: isFetchingBrackets } = useQuery({
     queryKey: ['taxBrackets', formData.taxYear],
-    queryFn: () => fetchTaxBrackets(formData.taxYear),
+    // Casting type as query will be disabled when there's no year
+    queryFn: () => fetchTaxBrackets(formData.taxYear as TaxYear),
+    enabled: formData.taxYear !== '',
   })
+  const { tax_brackets: taxBrackets } = data ?? {}
 
-  const handleInputChange = (field: keyof FormData) => {
+  const handleInputChange = useCallback((field: keyof FormData) => {
     return (e: InputChangeEvent) => {
-      // Convert income to number for math later on
-      const value = field === 'income' ? Number(e.target.value) : e.target.value
+      let value: string | number = e.target.value
+
+      // Convert income to number for math later on, but keep empty string as is
+      if (field === 'income' && value !== '') {
+        value = Number(e.target.value)
+      }
 
       setFormData(prevFormData => ({
         ...prevFormData,
         [field]: value,
       }))
     }
-  }
+  }, [])
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    // todo: calculate taxes. Custom hook? New Component?
+
+    // Valid income and brackets are required to submit, but TS doesn't know that
+    if (
+      typeof formData.income === 'number' &&
+      formData.income > 0 &&
+      taxBrackets
+    ) {
+      const calculatedTaxes = calculateTaxes(formData.income, taxBrackets)
+      console.log('🚀🚀🚀🚀', calculatedTaxes)
+    }
   }
 
   const canSubmit =
@@ -53,9 +79,10 @@ export default function TaxCalculatorForm() {
         <label htmlFor={incomeId}>Annual Income</label>
         <div className={styles['income-input-currency']}>
           <input
+            required
             id={incomeId}
             type="number"
-            min={0}
+            min={1}
             max={999_999_999} // Don't use this app, see an accountant ;)
             value={formData.income}
             onChange={handleInputChange('income')}
@@ -65,14 +92,19 @@ export default function TaxCalculatorForm() {
       <div>
         <label htmlFor={taxYearId}>Tax Year</label>
         <select
+          required
           id={taxYearId}
           value={formData.taxYear}
           onChange={handleInputChange('taxYear')}
         >
+          <option value="" disabled>
+            Select a year
+          </option>
           <option value="2019">2019</option>
           <option value="2020">2020</option>
           <option value="2021">2021</option>
           <option value="2022">2022</option>
+          {/* enable me to test 404 errors! */}
           <option value="2024" disabled>
             2024
           </option>

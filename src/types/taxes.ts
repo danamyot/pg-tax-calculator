@@ -9,3 +9,12 @@ export interface TaxBracketsResponse {
 }
 
 export type TaxYear = '2019' | '2020' | '2021' | '2022'
+
+export interface TaxCalculation {
+  taxesByBracket: Array<{
+    bracket: TaxBracket
+    taxAmount: number
+  }>
+  totalTax: number
+  effectiveRate: number
+}

@@ -1,5 +1,6 @@
+import TaxCalculatorForm from './components//tax-calculator/tax-calculator-form'
+
 import styles from './App.module.css'
-import TaxCalculatorForm from './components/tax-calculator-form'
 
 function App() {
   return (

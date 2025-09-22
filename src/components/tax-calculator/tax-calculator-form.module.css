@@ -1,7 +1,7 @@
 .tax-form {
   display: flex;
-  place-items: center;
-  gap: 8px;
+  flex-direction: column;
+  gap: 16px;
 
   label {
     text-align: start;
