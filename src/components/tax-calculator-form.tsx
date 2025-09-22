@@ -1,17 +1,19 @@
 import { useId, useState, type ChangeEvent, type FormEvent } from 'react'
+import type { TaxYear } from '../types/taxes'
 import styles from './tax-calculator-form.module.css'
-
-const INITIAL_FORM_DATA = {
-  income: undefined,
-  taxYear: '2022',
-}
-
+import { fetchTaxBrackets } from '../services/api'
+import { useQuery } from '@tanstack/react-query'
 interface FormData {
   income?: number
-  taxYear: string
+  taxYear: TaxYear
 }
 
 type InputChangeEvent = ChangeEvent<HTMLInputElement | HTMLSelectElement>
+
+const INITIAL_FORM_DATA: FormData = {
+  income: undefined,
+  taxYear: '2022',
+}
 
 export default function TaxCalculatorForm() {
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA)
@@ -19,11 +21,20 @@ export default function TaxCalculatorForm() {
   const incomeId = useId()
   const taxYearId = useId()
 
+  // Fetch tax brackets for the selected year
+  const { data: taxBrackets, isLoading: isFetchingBrackets } = useQuery({
+    queryKey: ['taxBrackets', formData.taxYear],
+    queryFn: () => fetchTaxBrackets(formData.taxYear),
+  })
+
   const handleInputChange = (field: keyof FormData) => {
     return (e: InputChangeEvent) => {
+      // Convert income to number for math later on
+      const value = field === 'income' ? Number(e.target.value) : e.target.value
+
       setFormData(prevFormData => ({
         ...prevFormData,
-        [field]: e.target.value,
+        [field]: value,
       }))
     }
   }
@@ -33,6 +44,9 @@ export default function TaxCalculatorForm() {
     // todo: calculate taxes. Custom hook? New Component?
   }
 
+  const canSubmit =
+    formData.income && formData.income > 0 && taxBrackets && !isFetchingBrackets
+
   return (
     <form className={styles['tax-form']} onSubmit={handleSubmit}>
       <div>
@@ -41,7 +55,8 @@ export default function TaxCalculatorForm() {
           <input
             id={incomeId}
             type="number"
-            max={999_999_999} // See an accountant ;)
+            min={0}
+            max={999_999_999} // Don't use this app, see an accountant ;)
             value={formData.income}
             onChange={handleInputChange('income')}
           />
@@ -62,8 +77,12 @@ export default function TaxCalculatorForm() {
             2024
           </option>
         </select>
+        {isFetchingBrackets && <p>Loading tax brackets...</p>}
       </div>
-      <button type="submit">Calculate Tax</button>
+
+      <button type="submit" disabled={!canSubmit}>
+        Calculate Tax
+      </button>
     </form>
   )
 }
