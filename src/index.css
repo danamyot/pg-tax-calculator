@@ -118,6 +118,59 @@ button {
   }
 }
 
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+
+input,
+select {
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  padding: var(--input-padding);
+  background-color: var(--input-bg);
+  color: inherit;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: var(--transition);
+  width: 100%;
+  min-height: 2.75rem;
+
+  &:focus {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 2px;
+    border-color: var(--focus-color);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+/* Remove up/down arrows on number input, scroll still works */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  opacity: 0;
+}
+
+select {
+  cursor: pointer;
+
+  &:focus {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 2px;
+  }
+}
+
+input:invalid,
+select:invalid,
+input[aria-invalid='true'],
+select[aria-invalid='true'] {
+  border-color: var(--error-color);
+}
+
 @media (prefers-color-scheme: light) {
   /* Light mode color overrides */
   :root {
